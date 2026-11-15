@@ -2464,6 +2464,14 @@ static void configure_accelerators(const char *progname)
             bool have_kvm = accel_find("kvm");
             bool have_hvf = accel_find("hvf");
 
+#ifdef XBOX
+            if (g_config.sys.accel == CONFIG_SYS_ACCEL_KVM) {
+                if (!have_kvm) {
+                    warn_report("KVM is unavailable in this build; using TCG");
+                }
+                accelerators = have_kvm ? "kvm:tcg" : "tcg";
+            } else
+#endif
             if (have_tcg && have_kvm) {
                 if (g_str_has_suffix(progname, "kvm")) {
                     /* If the program name ends with "kvm", we prefer KVM */
@@ -3016,10 +3024,9 @@ void qemu_init(int argc, char **argv)
         "none",
     }[g_config.sys.avpack];
 
-    fake_argv[fake_argc++] = g_strdup_printf("xbox%s%s%s,avpack=%s",
+    fake_argv[fake_argc++] = g_strdup_printf("xbox%s%s,avpack=%s",
         (bootrom_arg != NULL) ? bootrom_arg : "",
         g_config.general.skip_boot_anim ? ",short-animation=on" : "",
-        ",kernel-irqchip=off",
         avpack_str
         );
 

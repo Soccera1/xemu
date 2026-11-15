@@ -455,6 +455,7 @@ static void xbox_machine_options(MachineClass *m)
     m->no_floppy         = 1,
     m->no_cdrom          = 1,
     m->default_cpu_type  = X86_CPU_TYPE_NAME("pentium3");
+    m->default_kernel_irqchip_split = true;
     m->is_default        = true;
     m->default_nic       = "nvnet";
 

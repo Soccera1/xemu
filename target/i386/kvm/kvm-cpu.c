@@ -18,6 +18,10 @@
 #include "kvm_i386.h"
 #include "accel/accel-cpu-target.h"
 
+#ifdef XBOX
+#include "ui/xemu-settings.h"
+#endif
+
 static void kvm_set_guest_phys_bits(CPUState *cs)
 {
     X86CPU *cpu = X86_CPU(cs);
@@ -174,13 +178,23 @@ static void kvm_cpu_xsave_init(void)
  *       docs/system/target-i386.rst)
  */
 static PropValue kvm_default_props[] = {
+#ifdef XBOX
+    { "enforce", "on" },
+    { "vendor", CPUID_VENDOR_INTEL },
+    { "hypervisor", "off" },
+    { "kvm", "off" },
+#endif
     { "kvmclock", "on" },
     { "kvm-nopiodelay", "on" },
     { "kvm-asyncpf", "on" },
     { "kvm-steal-time", "on" },
     { "kvm-pv-eoi", "on" },
     { "kvmclock-stable-bit", "on" },
+#ifdef XBOX
+    { "x2apic", "off" },
+#else
     { "x2apic", "on" },
+#endif
     { "kvm-msi-ext-dest-id", "off" },
     { "acpi", "off" },
     { "monitor", "off" },
@@ -230,6 +244,14 @@ static void kvm_cpu_instance_init(CPUState *cs)
     if (xcc->max_features) {
         kvm_cpu_max_instance_init(cpu);
     }
+
+#ifdef XBOX
+    if (g_config.sys.kvm_tsc_khz > 0) {
+        object_property_set_int(OBJECT(cpu), "tsc-frequency",
+                                (int64_t)g_config.sys.kvm_tsc_khz * 1000,
+                                &error_abort);
+    }
+#endif
 
     kvm_cpu_xsave_init();
 }

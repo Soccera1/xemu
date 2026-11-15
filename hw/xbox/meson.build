@@ -17,5 +17,6 @@ specific_ss.add(files(
 	'xblc.c',
 	'xid-gamepad.c',
 	))
+specific_ss.add(when: 'CONFIG_KVM', if_true: files('kvm.c'))
 subdir('nv2a')
 subdir('mcpx')

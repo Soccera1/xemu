@@ -73,6 +73,11 @@
 
 #include CONFIG_DEVICES
 
+#ifdef XBOX
+#include "hw/xbox/kvm.h"
+#include "ui/xemu-settings.h"
+#endif
+
 //#define DEBUG_KVM
 
 #ifdef DEBUG_KVM
@@ -3257,6 +3262,14 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
     int ret;
     struct utsname utsname;
     Error *local_err = NULL;
+
+#ifdef XBOX
+    ret = xbox_kvm_check_guest_modes(s, g_config.sys.kvm_tsc_khz, &local_err);
+    if (ret < 0) {
+        error_report_err(local_err);
+        return ret;
+    }
+#endif
 
     /*
      * Initialize confidential guest (SEV/TDX) context, if required

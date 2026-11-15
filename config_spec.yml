@@ -351,6 +351,13 @@ net:
           default: tcp
 
 sys:
+  accel:
+    type: enum
+    values: [tcg, kvm]
+    default: tcg
+  kvm_tsc_khz:
+    type: integer
+    default: 0
   mem_limit:
     type: enum
     values: ['64', '128']
